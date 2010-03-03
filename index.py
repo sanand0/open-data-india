@@ -50,27 +50,27 @@ class RequestHandler(webapp.RequestHandler):
             tags = utils.auto_tag(words=words, stop_words=stop_words)
         return mime_type, title, tags
 
-    def _create_bookmark(self, url):
+    def _create_bookmark(self, url, usertags):
         """Create a bookmark corresponding to the specified URL."""
         current_user = users.get_current_user()
         _log.info('%s creating bookmark %s' % (current_user.email(), url))
         dupe_bookmark = models.Bookmark.all().filter('user =', current_user)
         if dupe_bookmark.filter('url =', url).count() == 0:
-            new_bookmark = self._save_bookmark(url, bookmark=None)
+            new_bookmark = self._save_bookmark(url, usertags, bookmark=None)
             _log.info('%s created bookmark %s' % (current_user.email(), url))
             return new_bookmark
         else:
             _log.warning("%s couldn't create bookmark %s (already exists?)" %
                          (current_user.email(), url))
 
-    def _update_bookmark(self, key_id):
+    def _update_bookmark(self, key_id, usertags):
         """Update the bookmark corresponding to the specified URL."""
         current_user = users.get_current_user()
         _log.info('%s updating bookmark %s' % (current_user.email(), key_id))
         stale_bookmark = models.Bookmark.get_by_id(key_id)
         if stale_bookmark:
             url = stale_bookmark.url
-            fresh_bookmark = self._save_bookmark(url, bookmark=stale_bookmark)
+            fresh_bookmark = self._save_bookmark(url, usertags, bookmark=stale_bookmark)
             fresh_bookmark.updated = datetime.datetime.now()
             _log.info('%s updated bookmark %s' % (current_user.email(), url))
             return fresh_bookmark
@@ -78,7 +78,7 @@ class RequestHandler(webapp.RequestHandler):
             _log.warning("%s couldn't update bookmark %s (doesn't exist?)" %
                          (current_user.email(), key_id))
 
-    def _save_bookmark(self, url, bookmark=None):
+    def _save_bookmark(self, url, usertags, bookmark=None):
         """Save a bookmark corresponding to the specified URL."""
         if bookmark is None:
             bookmark = models.Bookmark()
@@ -91,6 +91,8 @@ class RequestHandler(webapp.RequestHandler):
             bookmark.stems.append(tag['stem'])
             bookmark.words.append(tag['word'])
             bookmark.counts.append(tag['count'])
+        for tag in usertags:
+            bookmark.tags.append(tag)
         bookmark.put()
         self._index_bookmark(bookmark)
         return bookmark

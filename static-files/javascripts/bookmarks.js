@@ -63,7 +63,7 @@ function create_bookmark() {
     $.ajax({
         type: "POST",
         url: "/users",
-        data: "url_to_create=" + $("#url_to_create").val(),
+        data: $('form#create_bookmark').serialize(),
         success: function(data, text_status) {
             $("#bookmark_list").prepend(data);
             $("#bookmark_list li.bookmark:hidden .update_bookmark").submit(update_bookmark);

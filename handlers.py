@@ -171,6 +171,7 @@ class Users(index.RequestHandler, search.RequestHandler, rss.RequestHandler,
         current_user = target_user = users.get_current_user()
         url_to_create = self._get_url('url_to_create')
         key_to_update = self.request.get('key_to_update')
+        usertags = [tag.lower().strip() for tag in self.request.get('tags', '').split(',')]
         if key_to_update:
             key_to_update = int(cgi.escape(key_to_update))
         key_to_delete = self.request.get('key_to_delete')
@@ -180,9 +181,9 @@ class Users(index.RequestHandler, search.RequestHandler, rss.RequestHandler,
         if url_to_create or key_to_update:
             path = os.path.join(TEMPLATES, 'bookmarks', 'bookmarks.html')
             if url_to_create:
-                bookmark = self._create_bookmark(url_to_create)
+                bookmark = self._create_bookmark(url_to_create, usertags)
             elif key_to_update:
-                bookmark = self._update_bookmark(key_to_update)
+                bookmark = self._update_bookmark(key_to_update, usertags)
             bookmarks = [bookmark] if bookmark is not None else []
             values = {'snippet': True, 'current_user': current_user,
                 'target_user': target_user, 'bookmarks': bookmarks,}
