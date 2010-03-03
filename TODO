@@ -1,0 +1,8 @@
+Action items:
+    / allow users add a link with tags
+        - make user tags searchable
+        - make the tags a list of categories, not strings
+    - hourly cron job that scans delicious for new links tagged #open-data-india
+    - directory structure / tag cloud
+    - all UI jing-bang
+    - hourly cron job that scans twitter for new links tagged #open-data-india
