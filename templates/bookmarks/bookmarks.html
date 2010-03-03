@@ -79,6 +79,17 @@
             </ul>
         {% endif %}
 
+        {% if bookmark.tags and not bookmark|is_audio and not bookmark|is_youtube_video %}
+            <ul class="tag_cloud">
+                {% for word in bookmark.tags %}
+                    <li class="tag">
+                        <a href="/search/{{ word }}"
+                           rel="nofollow">{{ word }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
         {% if current_user and target_user %}
             {% ifequal current_user target_user %}
                 {% if not bookmark.words and not bookmark|is_image and not bookmark|is_audio %}
